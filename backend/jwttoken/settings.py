@@ -135,8 +135,16 @@ REST_FRAMEWORK = {
       ],
 }
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:1234'  # Replace with the actual origin of your frontend application
-]
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:1234',
+#     'http://localhost:42107',  # Replace with the actual origin of your frontend application
+# ]
 
-CORS_ALLOW_CREDENTIALS = True
+# CORS_ALLOW_CREDENTIALS = True
+
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:1234',      
+#     'http://localhost:42107'   # Replace with the domain of your React application
+# ]
+
+CORS_ORIGIN_ALLOW_ALL = True
