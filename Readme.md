@@ -255,7 +255,7 @@ class LogoutView(APIView):
 ```
 
 <br>
-<hr>
+<hr><hr>
 <br>
 
 ## React
@@ -274,25 +274,175 @@ npm i axios
 npm i react-router-dom
 ```
 #### Create the following components.
-Home
+#### **Home**
 ```react
+const Home = () => {
+    return(
+        <div>
+            <h1>
+                Home page
+            </h1>
+        </div>
+    )
+}
+export default Home;
+```
+<br> 
+
+#### **Login**
+```react
+import React, {useState} from 'react';
+import Cookies from 'js-cookie';
+import axios from 'axios';
+import 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {useNavigate} from 'react-router-dom';
+
+const Login = () => {
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const navigate = useNavigate();
+
+
+    const submit = async (e) => {
+      e.preventDefault();
+      const user = {
+        email : email,
+        password: password
+      }
+      try {
+        const {data} = await axios.post("http://localhost:8000/token/", user)
+        
+        // Storing Access in cookie
+        Cookies.set('access_token', data.access);
+        Cookies.set('refresh_token', data.refresh);
+        navigate("/");
+      }
+      catch (error) {
+        console.error("error in token fetch: ", error.message)
+      }
+
+    }
+    
+
+    return(
+        <div className="Auth-form-container">
+          <form className="Auth-form" onSubmit={submit}>
+            <div className="Auth-form-content">
+              <h3 className="Auth-form-title">Sign In</h3>
+              <div className="form-group mt-3">
+                <label>Email</label>
+                <input className="form-control mt-1" 
+                  placeholder="Enter Email" 
+                  name='email'  
+                  type='email' value={email}
+                  required 
+                  onChange={e => setEmail(e.target.value)}/>
+              </div>
+              <div className="form-group mt-3">
+                <label>Password</label>
+                <input name='password' 
+                  type="password"     
+                  className="form-control mt-1"
+                  placeholder="Enter password"
+                  value={password}
+                  required
+                  onChange={e => setPassword(e.target.value)}/>
+              </div>
+              <div className="d-grid gap-2 mt-3">
+                <button type="submit" 
+                   className="btn btn-primary">Submit</button>
+              </div>
+            </div>
+         </form>
+       </div>
+       )
+};
+export default Login;  
+```
+Here two states (email and password) is created using useState() hook to store the value of email and password entered by the user in the input field. when the submit button is pressed, the submit() function is called and e.preventDefault prevent the default form submission by javascript.
+A user object is created which contains the username and password entered by the user. Then axios is used to send the data to the remote server using async and await. In axios the first parameter is the url and the second parameter is the data to be send. The return from axios is stored in the data object.
+Since JWT token is only stored in the client side, we used 'js-cookie' library to store the token in a cookie.  
+
+<br> 
+
+#### **Navigation**
+```react
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import React, { useEffect, useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Cookies from 'js-cookie';
+import { Link, NavLink } from 'react-router-dom';
+
+export function Navigation() {
+  const [isAuth, setIsAuth] = useState(false);
+  console.log(isAuth);
+
+  useEffect(() => {
+    const access_token = Cookies.get('access_token');
+    setIsAuth(!!access_token);
+  }, [isAuth]);
+
+  return (
+    <div>
+      <Navbar bg="dark" variant="dark">
+        <Navbar.Brand as={Link} to="/">
+          JWT Authentication
+        </Navbar.Brand>
+        <Nav className="me-auto">
+          {isAuth && (
+            <Nav.Link as={NavLink} to="/" exact activeClassName="active">
+              Home
+            </Nav.Link>
+          )}
+        </Nav>
+        <p style={{ color: 'white' }}>isAuth: {isAuth.toString()}</p>
+        <Nav>
+          {isAuth ? (
+            <Nav.Link as={NavLink} to="/user/logout" exact activeClassName="active">
+              Logout
+            </Nav.Link>
+          ) : (
+            <Nav.Link as={NavLink} to="/user/login" exact activeClassName="active">
+              Login
+            </Nav.Link>
+          )}
+        </Nav>
+      </Navbar>
+    </div>
+  );
+}
 
 ```
+<br>
 
-Login
+#### **App.js**
 ```react
+import { Navigation } from "./component/navigations";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import Home from './component/Home'
+import Login from "./component/Login";
+import Logout from "./component/Logout";
 
-```
 
+const App = () => {
+    return (
+        <Router>
 
-Navigation
-```react
+            <Navigation />
+            
+            <Routes>
+                <Route exact path="/" element={< Home />} />
+                <Route path="/user/login/" element={<Login />} />
+                <Route path="/user/logout/" element={< Logout />} />
 
-```
+            </Routes>
+        </Router >
 
-Modify the App.js based on the following code to include Routes.
-```react
-
+    )
+}
+export default App;
 ```
 
 Start the app
@@ -300,7 +450,14 @@ Start the app
 npm start
 ```
 
-Then open http://localhost:3000/ to see your app.
+Then open http://localhost:3000/ to see the app.
+
+After opening [http://localhost:8000/token/](http://localhost:8000/token/) in and sending a valid email and password, a cookie will be created in the browser. 
+
+![images](/frontend/images/cookies.png)
+
+<hr>
+<br>
 
 ### Some key points about JWT storage.
 > A JWT needs to be stored in a safe place inside the user’s browser. If you store it inside localStorage, it’s accessible by any script inside your page. This is as bad as it sounds; an XSS attack could give an external attacker access to the token.To keep them secure, you should always store JWTs inside an httpOnly cookie. This is a special kind of cookie that’s only sent in HTTP requests to the server. It’s never accessible (both for reading or writing) from JavaScript running in the browser.
