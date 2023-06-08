@@ -275,7 +275,7 @@ npm i react-router-dom
 ```
 #### Create the following components.
 #### **Home**
-```react
+```javascript
 const Home = () => {
     return(
         <div>
@@ -290,7 +290,7 @@ export default Home;
 <br> 
 
 #### **Login**
-```react
+```javascript
 import React, {useState} from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -367,7 +367,7 @@ Since JWT token is only stored in the client side, we used 'js-cookie' library t
 <br> 
 
 #### **Navigation**
-```react
+```javascript
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import React, { useEffect, useState } from 'react';
@@ -418,7 +418,7 @@ export function Navigation() {
 <br>
 
 #### **App.js**
-```react
+```javascript
 import { Navigation } from "./component/navigations";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import Home from './component/Home'
@@ -467,4 +467,3 @@ After opening [http://localhost:8000/token/](http://localhost:8000/token/) in an
 ### Considering future implementation with mobile Apps.
 Considering that you want to implement a headless architecture where the data can be accessed by both mobile apps and web apps simultaneously, sending the token as a raw token is a common approach. This allows more flexibility in handling cross-domain requests and sharing tokens between different client applications.
 
-### Refreshing tokens
